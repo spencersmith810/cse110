@@ -1,0 +1,26 @@
+print('Hello! I would love for you to fill in the blank: \n')
+
+adjective = input("Adjective: ")
+animal = input("Animal: ")
+verb1 = input("Verb: ")
+exclamation = input("Exlamation: ")
+verb2 = input("Verb: ")
+verb3 = input("Verb: ")
+place = input("Place: ")
+food = input("Food: ")
+emotion = input("Emotion: ")
+
+print("-"*30)
+print('Your story is: \n')
+
+print(f'I was in so much trouble the other day...')
+print(f'It all started when I saw a')
+print(f'{adjective} {animal} {verb1} down the hall.')
+print(f'{exclamation.capitalize()}!!" I yelled. But all I could do was to')
+print(f'{verb2} over and over again. Miraculously,')
+print(f'that caused it to stop, but not before it tried to {verb3}')
+print(f'right in front of my family.\n')
+
+print(f'After this eventful evening, I ran to the nearest {place}.')
+print(f'I bought some {food} and finally started to feel {emotion}.')
+print("-"*30)

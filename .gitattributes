@@ -1,0 +1,2 @@
+# Preserve the original Python snapshots byte-for-byte on every platform.
+source/** -text
