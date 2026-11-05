@@ -52,9 +52,10 @@ def main():
             checked += 1
     catalog = json.loads((ROOT / 'catalog.json').read_text())
     manifest = json.loads((ROOT / 'source-manifest.json').read_text())
-    assert len(catalog['projects']) == 27
-    assert len(list((ROOT / 'projects').glob('*.html'))) == 27
-    assert len(list((ROOT / 'weeks').glob('*.html'))) == 7
+    project_count = len(catalog['projects'])
+    week_count = len(catalog['weeks'])
+    assert len(list((ROOT / 'projects').glob('*.html'))) == project_count
+    assert len(list((ROOT / 'weeks').glob('*.html'))) == week_count
     with zipfile.ZipFile(ROOT / 'downloads/python-assignments.zip') as archive:
         assert set(archive.namelist()) == set(manifest)
         for name, checksum in manifest.items():
@@ -66,7 +67,7 @@ def main():
                 assert original.read_bytes() == copied, f'Original mismatch: {name}'
     if errors:
         raise SystemExit('\n'.join(errors))
-    print(f'PASS: {len(pages)} HTML pages, {checked} local links and assets, 27 exact source copies, and the downloadable archive.')
+    print(f'PASS: {len(pages)} HTML pages, {checked} local links and assets, {project_count} exact source copies, and the downloadable archive.')
 
 
 if __name__ == '__main__':

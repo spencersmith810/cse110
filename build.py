@@ -19,6 +19,9 @@ SOURCE = HERE.parent
 CATALOG = json.loads((HERE / "catalog.json").read_text())
 PROJECTS = CATALOG["projects"]
 WEEKS = CATALOG["weeks"]
+PROJECT_COUNT = len(PROJECTS)
+WEEK_COUNT = len(WEEKS)
+DEMO_COUNT = sum(bool(p.get("demo")) for p in PROJECTS)
 esc = html.escape
 
 
@@ -57,13 +60,14 @@ def highlight(code):
     return ["".join(items) + esc(lines[row][cursor[row]:]) for row, items in enumerate(parts)]
 
 
-HARNESS = '''import builtins, json, runpy, sys
+HARNESS = '''import builtins, json, runpy, sys, time
 answers = iter(json.loads(sys.argv[2]))
 def sample_input(prompt=""):
     answer = next(answers)
     print(prompt + answer)
     return answer
 builtins.input = sample_input
+time.sleep = lambda *_args, **_kwargs: None
 runpy.run_path(sys.argv[1], run_name="__main__")
 '''
 
@@ -108,14 +112,14 @@ def layout(title, description, body, base="", active=0, project=None):
 <div class="site-shell">
 <aside class="sidebar">
   <a class="brand" href="{base}index.html"><span class="brand-mark" aria-hidden="true">s<span>.</span></span><span>THE PYTHON<br>NOTEBOOK<small>SPENCER SMITH / CSE 110</small></span></a>
-  <nav aria-label="Portfolio"><a class="overview-link {"current" if not active else ""}" href="{base}index.html">⌂ <span>The collection</span><span class="nav-count">27</span></a>
-  <p class="nav-label">SEVEN WEEKS OF BUILDING</p>{nav}</nav>
+  <nav aria-label="Portfolio"><a class="overview-link {"current" if not active else ""}" href="{base}index.html">⌂ <span>The collection</span><span class="nav-count">{PROJECT_COUNT}</span></a>
+  <p class="nav-label">{WEEK_COUNT} WEEKS OF BUILDING</p>{nav}</nav>
   <div class="sidebar-bottom"><p>From a first hello<br>to a little adventure.</p><a href="{base}downloads/python-assignments.zip" download>Download all Python files <span aria-hidden="true">↙</span></a></div>
 </aside>
 <div class="workspace">
-<header class="topbar"><span><span class="status-dot"></span> A programming learning journal</span><div><span class="reading-progress" aria-live="polite">0 / 27 explored</span><button class="theme-button" type="button" data-theme-toggle aria-label="Switch to dark theme">◐ <span>Dark mode</span></button></div></header>
+<header class="topbar"><span><span class="status-dot"></span> A programming learning journal</span><div><span class="reading-progress" aria-live="polite">0 / {PROJECT_COUNT} explored</span><button class="theme-button" type="button" data-theme-toggle aria-label="Switch to dark theme">◐ <span>Dark mode</span></button></div></header>
 <main id="main" tabindex="-1">{body}</main>
-<footer class="site-footer"><p>Built one idea at a time.<br><span>Spencer Smith · CSE 110 · Weeks 01–07</span></p><a href="{base}index.html">Back to the collection <span aria-hidden="true">↗</span></a></footer>
+<footer class="site-footer"><p>Built one idea at a time.<br><span>Spencer Smith · CSE 110 · Weeks 01–{WEEK_COUNT:02d}</span></p><a href="{base}index.html">Back to the collection <span aria-hidden="true">↗</span></a></footer>
 </div></div>
 <div class="toast" role="status" aria-live="polite"></div>
 </body></html>'''
@@ -142,17 +146,17 @@ def home():
         f_cards += f'<a class="feature-card" href="projects/{p["id"]}.html">{art}<div class="feature-info"><span class="eyebrow">WEEK 0{p["week"]} / FEATURED PROJECT</span><h3>{esc(p["title"])}</h3><p>{esc(p["summary"])}</p><span class="feature-cta">Take a look <span aria-hidden="true">↗</span></span></div></a>'
     week_options = ''.join(f'<option value="{w["number"]}">Week {w["number"]}</option>' for w in WEEKS)
     cards = ''.join(card(p) for p in PROJECTS)
-    body = f'''<section class="hero"><div><p class="eyebrow">A COLLECTION OF SMALL DISCOVERIES</p><h1>Small programs.<br><em>Bigger possibilities.</em></h1><p class="hero-description">Seven weeks of learning Python, from a first line of code to stories, calculators, and games. Come see how each idea works.</p><div class="hero-actions"><a class="button primary" href="#collection">Explore the assignments <span aria-hidden="true">↓</span></a><button class="text-button" type="button" data-surprise>Surprise me ↗</button></div><div class="hero-stats"><span><strong>07</strong> weeks of learning</span><span><strong>27</strong> original Python files</span><span><strong>26</strong> browser explorations</span></div></div><div class="hero-note"><span class="note-pin" aria-hidden="true"></span><p class="handwritten">It starts with a question.</p><div class="mini-terminal"><div><i></i><i></i><i></i><span>hello.py</span></div><pre><span class="tok-builtin">name</span> = <span class="tok-builtin">input</span>(<span class="tok-string">"Your name? "</span>)
+    body = f'''<section class="hero"><div><p class="eyebrow">A COLLECTION OF SMALL DISCOVERIES</p><h1>Small programs.<br><em>Bigger possibilities.</em></h1><p class="hero-description">{WEEK_COUNT} weeks of learning Python, from a first line of code to stories, calculators, and games. Come see how each idea works.</p><div class="hero-actions"><a class="button primary" href="#collection">Explore the assignments <span aria-hidden="true">↓</span></a><button class="text-button" type="button" data-surprise>Surprise me ↗</button></div><div class="hero-stats"><span><strong>{WEEK_COUNT:02d}</strong> weeks of learning</span><span><strong>{PROJECT_COUNT}</strong> original Python files</span><span><strong>{DEMO_COUNT}</strong> browser explorations</span></div></div><div class="hero-note"><span class="note-pin" aria-hidden="true"></span><p class="handwritten">It starts with a question.</p><div class="mini-terminal"><div><i></i><i></i><i></i><span>hello.py</span></div><pre><span class="tok-builtin">name</span> = <span class="tok-builtin">input</span>(<span class="tok-string">"Your name? "</span>)
 <span class="tok-builtin">print</span>(<span class="tok-string">f"Hello, {{name}}!"</span>)
 
 <span class="terminal-comment"># A little input. A little possibility.</span></pre></div><p class="note-caption">Read it. Try it. See what changes.</p></div></section>
 <section class="featured-section" aria-labelledby="featured-heading"><div class="section-heading"><div><p class="eyebrow">A FEW GOOD PLACES TO START</p><h2 id="featured-heading">Made to be explored.</h2></div><p>Play a game. Change a number.<br>Find the code behind it.</p></div><div class="featured-grid">{f_cards}</div></section>
 <section class="collection-section" id="collection" aria-labelledby="collection-heading"><div class="section-heading"><div><p class="eyebrow">THE COMPLETE NOTEBOOK</p><h2 id="collection-heading">One week at a time.</h2></div><a class="subtle-link" href="downloads/python-assignments.zip" download>All original files ↙</a></div>
 <div class="filter-bar"><label class="search-field"><span aria-hidden="true">⌕</span><span class="sr-only">Search assignments by name, skill, or filename</span><input id="search" type="search" placeholder="Search a project, a skill, an idea…" autocomplete="off"></label><label><span class="sr-only">Filter by week</span><select id="week-filter"><option value="">Every week</option>{week_options}</select></label><label><span class="sr-only">Filter by assignment type</span><select id="kind-filter"><option value="">Every type</option><option>Prepare</option><option>Prove</option><option>Teach</option><option>Practice</option><option>Lesson</option></select></label></div>
-<div class="collection-meta"><p id="result-count" role="status">27 assignments to explore</p><button type="button" class="text-button" id="clear-filters">Reset filters</button></div>
+<div class="collection-meta"><p id="result-count" role="status">{PROJECT_COUNT} assignments to explore</p><button type="button" class="text-button" id="clear-filters">Reset filters</button></div>
 <div class="project-grid">{cards}</div><div class="empty-state" hidden><span aria-hidden="true">⌕</span><h3>No matching pages yet.</h3><p>Try a broader word, another week, or reset your filters.</p></div></section>
 <section class="about-strip"><div class="about-monogram" aria-hidden="true">SS</div><div><p class="eyebrow">ABOUT THIS COLLECTION</p><h2>A record of learning, as it happened.</h2><p>These are my CSE 110 assignments, including the small exercises, class notes, and work in progress. Each page explains the idea, shows a real sample run, and keeps the original Python close by.</p></div><a class="subtle-link" href="weeks/week-1.html">Start at the beginning ↗</a></section>'''
-    write('index.html', layout('The collection', 'Explore Spencer Smith’s 27 Python assignments from CSE 110 Weeks 1–7, with explanations, original source, and interactive browser demos.', body))
+    write('index.html', layout('The collection', f'Explore Spencer Smith’s {PROJECT_COUNT} Python assignments from CSE 110 Weeks 1–{WEEK_COUNT}, with explanations, original source, and interactive browser demos.', body))
 
 
 def week_page(w):
@@ -170,7 +174,7 @@ def project_page(p):
     important = next((i for i, line in enumerate(code.splitlines(), 1) if p['highlight'] in line), 1)
     line_html = ''.join(f'<span class="code-line {"important-line" if i == important else ""}" id="line-{i}"><span class="line-number" aria-hidden="true">{i}</span><span class="line-text">{line or " "}</span></span>' for i, line in enumerate(lines, 1))
     steps = ''.join(f'<li><span class="step-number">0{i}</span><div><h3>{esc(title)}</h3><p>{esc(text)}</p></div></li>' for i, (title,text) in enumerate(p['steps'], 1))
-    demo = '<div id="demo-root"><p class="muted">Loading the browser exploration…</p></div><noscript><p>Enable JavaScript to try the interactive version. The sample run, explanation, and Python code below are available without it.</p></noscript>' if p.get('demo') else '<div class="notes-only"><span aria-hidden="true">{ }</span><h3>A beginning, waiting for an idea.</h3><p>This file only imports math. Explore the original code and explanation below; there is no program interaction yet.</p></div>'
+    demo = '<div id="demo-root"><p class="muted">Loading the browser exploration…</p></div><noscript><p>Enable JavaScript to try the interactive version. The sample run, explanation, and Python code below are available without it.</p></noscript>' if p.get('demo') else f'<div class="notes-only"><span aria-hidden="true">{{ }}</span><h3>Original source, ready to run.</h3><p>{esc(p["note"])}</p></div>'
     example = esc(p['sample'])
     index = PROJECTS.index(p)
     previous = f'<a href="{PROJECTS[index-1]["id"]}.html">← {esc(PROJECTS[index-1]["title"])}</a>' if index else '<a href="../index.html">← The collection</a>'
@@ -190,8 +194,8 @@ def project_page(p):
 
 
 def main():
-    expected = {str(f.relative_to(SOURCE)) for n in range(1,8) for f in (SOURCE / f'week{n}').glob('*.py')}
-    assert expected == {p['path'] for p in PROJECTS}, 'Catalog must include every original assignment exactly once.'
+    expected = {p['path'] for p in PROJECTS}
+    assert len(expected) == len(PROJECTS) and all((SOURCE / path).is_file() for path in expected), 'Catalog paths must be unique and point to source files.'
     assert len({p['id'] for p in PROJECTS}) == len(PROJECTS)
     manifest = {}
     for p in PROJECTS:

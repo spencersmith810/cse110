@@ -1,40 +1,32 @@
-# CSE 110 - Word Guessing Game
-# Spencer Smith
-
 secret_word = "mosiah"
-guess = ""
+max_attempts = 6
 guess_count = 0
 
-print("Welcome to the word guessing game!")
-print()
+print("Guess the name of a book in the Book of Mormon.")
+print(f"You have {max_attempts} guesses.")
 
-# Generate one underscore for each letter in the secret word.
-hint = ""
-for letter in secret_word:
-    hint += "_ "
-print(f"Your hint is: {hint}")
-
-while guess != secret_word:
-    guess = input("What is your guess? ").lower()
+while guess_count < max_attempts:
+    guess = input("Your guess: ").lower()
     guess_count += 1
 
-    if guess != secret_word:
-        if len(guess) != len(secret_word):
-            print("Sorry, the guess must have the same number of letters as the secret word.")
-            print()
-        else:
-            hint = ""
+    if guess == secret_word:
+        print(f"Correct! You guessed it in {guess_count} attempts.")
+        break
 
-            for index in range(len(secret_word)):
-                # Check the exact position before checking elsewhere in the word.
-                if guess[index] == secret_word[index]:
-                    hint += guess[index].upper() + " "
-                elif guess[index] in secret_word:
-                    hint += guess[index] + " "
-                else:
-                    hint += "_ "
+    if len(guess) != len(secret_word):
+        print(f"Your guess must have {len(secret_word)} letters.")
+    else:
+        hint = ""
 
-            print(f"Your hint is: {hint}")
+        for index in range(len(secret_word)):
+            if guess[index] == secret_word[index]:
+                hint += guess[index].upper()
+            elif guess[index] in secret_word:
+                hint += guess[index]
+            else:
+                hint += "_"
 
-print("Congratulations! You guessed it!")
-print(f"It took you {guess_count} guesses.")
+        print(f"Hint: {hint}")
+        print(f"Attempts left: {max_attempts - guess_count}")
+else:
+    print(f"You are out of guesses. The word was {secret_word}.")
